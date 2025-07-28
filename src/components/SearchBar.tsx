@@ -40,6 +40,12 @@ export default function SearchBar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const handleInputFocus = () => {
+    if (query.length >= 2 && results.length > 0) {
+      setIsOpen(true);
+    }
+  };
+
   useEffect(() => {
     if (query.length >= 2) {
       const filtered = products.filter(product =>
@@ -51,12 +57,20 @@ export default function SearchBar() {
       setResults([]);
       setIsOpen(false);
     }
-  }, [query]);
+  }, [query, products]);
 
   const handleSelect = (product: Product) => {
     setQuery('');
     setIsOpen(false);
     navigate(`/${product.type}`);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && results.length > 0) {
+      handleSelect(results[0]);
+    } else if (e.key === 'Escape') {
+      setIsOpen(false);
+    }
   };
 
   return (
@@ -66,13 +80,18 @@ export default function SearchBar() {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onFocus={handleInputFocus}
+          onKeyDown={handleKeyDown}
           placeholder="Search eyewear..."
           className="w-full pl-10 pr-10 py-2.5 sm:py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm placeholder-gray-500 shadow-sm hover:shadow-md focus:shadow-lg"
         />
         <Search className="absolute left-3 top-2.5 sm:top-3.5 h-4 w-4 text-gray-400" />
         {query && (
           <button
-            onClick={() => setQuery('')}
+            onClick={() => {
+              setQuery('');
+              setIsOpen(false);
+            }}
             className="absolute right-3 top-2.5 sm:top-3.5 text-gray-400 hover:text-gray-600 transition-colors duration-200"
           >
             <X className="h-4 w-4" />
@@ -81,7 +100,7 @@ export default function SearchBar() {
       </div>
 
       {isOpen && results.length > 0 && (
-        <div className="absolute z-50 w-full mt-1 bg-white rounded-lg shadow-xl border border-gray-200 max-h-64 sm:max-h-80 overflow-y-auto">
+        <div className="absolute z-[9999] w-full mt-1 bg-white rounded-lg shadow-xl border border-gray-200 max-h-64 sm:max-h-80 overflow-y-auto">
           {results.map((product) => (
             <div
               key={product.id}

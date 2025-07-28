@@ -1,10 +1,9 @@
 import React from 'react';
 import { ArrowRight, Shield, Star, Truck, Eye, Glasses, Sparkles, Clock } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import SearchBar from '../components/SearchBar';
 
 export default function Home() {
-  const navigate = useNavigate();
 
   return (
     <main>
